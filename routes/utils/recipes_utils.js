@@ -39,20 +39,24 @@ async function getRecipeDetails(recipe_id) {
 
 
 async function searchRecipe(query, num, cuisine, diet, intolerances){
-    let recipe = await axios.get(`${api_domain}/complexSearch`,{
-        params:{
-            apiKey: process.env.spooncular_apiKey,
-            query: query,
-            num: num,
-            cuisine: cuisine,
-            diet: diet,
-            intolerances: intolerances
-
-        },
-    })
-    return recipe;
+    let recipe = router.get("/search/query/:searchQuery/amount/:num", (req, res) => {
+    const { searchQuery, num } = req.params; 
+    if (searchQuery == "<string>") {
+        res.send({ message: "searchQuery parameter is missing" });
+    }
+    search_params = {};
+    search_params.query = searchQuery; 
+    search_params.number = num;
+    search_params.instructionRequired = true;
+      
+    //check if optional queries params exists (cuisine,diet,intolerance) and if they exist we will add them to search_params
+    search_util.extractQueriesParams(req.query, search_params);
+    search_util
+    .searchForRescipes(search_params)
+    .then((info_array) => res.send(info_array)) // return to client info array about the recipes that return from the search
+    });
 }
-
+      
 
 async function getRandomRecipe() {
     let res = await axios.get(`${api_domain}/random`, {

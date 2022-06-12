@@ -6,9 +6,17 @@ const bcrypt = require("bcrypt");
 
 router.post("/Register", async (req, res, next) => {
   try {
-    // parameters exists
-    // valid parameters
-    // username exists
+    if (
+      !req.body.firstname ||
+      !req.body.lastname ||
+      !req.body.email ||
+      !req.body.profileurl ||
+      !req.body.username ||
+      !req.body.password ||
+      !req.body.country
+    ) {
+      throw { status: 500, message: "one or more of the details is missing" };
+    }
     let user_details = {
       username: req.body.username,
       firstname: req.body.firstname,
@@ -22,8 +30,10 @@ router.post("/Register", async (req, res, next) => {
     users = await DButils.execQuery("SELECT username from users");
 
     if (users.find((x) => x.username === user_details.username))
-      throw { status: 409, message: "Username taken" };
-
+      throw { status: 500, message: "Username is exist!" };
+    if(req.body.password != req.body.confirmation_password) {
+      throw { status: 500, message: "The password is wrong!" };
+    }
     // add the new username
     let hash_password = bcrypt.hashSync(
       user_details.password,

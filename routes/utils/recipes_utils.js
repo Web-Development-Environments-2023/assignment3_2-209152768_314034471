@@ -39,20 +39,9 @@ async function getRecipeDetails(recipe_id) {
 
 
 async function searchRecipe(query, num, cuisine, diet, intolerances){
-    let recipe = await axios.get(`${api_domain}/complexSearch`,{
-        params:{
-            apiKey: process.env.spooncular_apiKey,
-            query: query,
-            num: num,
-            cuisine: cuisine,
-            diet: diet,
-            intolerances: intolerances
-
-        },
-    })
-    return recipe;
+   /////////////////////////////////
 }
-
+      
 
 async function getRandomRecipe() {
     let res = await axios.get(`${api_domain}/random`, {

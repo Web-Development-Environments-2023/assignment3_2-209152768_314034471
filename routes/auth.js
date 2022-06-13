@@ -30,7 +30,7 @@ router.post("/Register", async (req, res, next) => {
     users = await DButils.execQuery("SELECT username from users");
 
     if (users.find((x) => x.username === user_details.username))
-      throw { status: 500, message: "Username is exist!" };
+      throw { status: 409, message: "Username is exist!" };
     if(req.body.password != req.body.confirmation_password) {
       throw { status: 500, message: "The password is wrong!" };
     }
@@ -51,6 +51,11 @@ router.post("/Register", async (req, res, next) => {
 
 router.post("/Login", async (req, res, next) => {
   try {
+    if (req.session && req.session.user_id)
+    {
+      res.send({ success: false, status: 201, message: "User is already login!"});
+      return;
+    }
     // check that username exists
     const users = await DButils.execQuery("SELECT username FROM users");
     if (!users.find((x) => x.username === req.body.username))

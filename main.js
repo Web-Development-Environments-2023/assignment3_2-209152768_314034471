@@ -6,6 +6,7 @@ var logger = require("morgan");
 const session = require("client-sessions");
 const DButils = require("./routes/utils/DButils");
 var cors = require('cors')
+process.env['spooncular_apiKey'] = "41fb893715564494b2ae9233c6b9a832";
 
 var app = express();
 app.use(logger("dev")); //logger

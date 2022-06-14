@@ -13,8 +13,8 @@ router.get("/search", async (req, res, next) => {
     const cuisine = req.query.cuisine;
     const diet = req.query.diet;
     const intolerances = req.query.intolerances;
-    const recipe = await recipes_utils.searchRecipe(query, num, cuisine, diet, intolerances);
-    res.send(recipe);
+    const recipes = await recipes_utils.searchRecipes(query, num, cuisine, diet, intolerances);
+    res.send(recipes);
   } catch (error) {
     next(error);
   }
@@ -22,8 +22,9 @@ router.get("/search", async (req, res, next) => {
 
 router.get("/random", async (req, res, next) => {
   try{
-    const ran = await recipes_utils.getRandomRecipe(req.params.type, req.session.user_id);
-    res.send(ran)
+    const num = req.query.num;
+    const recipes = await recipes_utils.getRandomRecipes(num);
+    res.send(recipes)
   }catch{
     next(error)
   }

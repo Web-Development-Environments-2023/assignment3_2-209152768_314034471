@@ -20,6 +20,7 @@ router.use(async function (req, res, next) {
   }
 });
 
+//FAVORITE PAGE
 
 /**
  * This path gets body with recipeId and save this recipe in the favorites list of the logged-in user
@@ -52,6 +53,101 @@ router.get('/favorites', async (req,res,next) => {
   }
 });
 
+// add recipe to the favorite page to user
+router.post("/favorites", async (req, res, next) => {
+  try {
+    const user_id = req.session.user_id;
+    const recipe_id = req.body.recipe_id;
+    await user_utils.markAsFavorite(user_id, recipe_id);
+    res.status(200).send("The recipe saved in favorite!");
+  } catch (error) {
+    next(error);
+  }
+});
 
+//FAMILY PAGE
+
+//show the family recipe
+router.get("/family",async(req, res, next)=>{
+  try{
+    const recipes = await user_utils.getFamilyRecipes(req.session.user_id)
+    res.status(200).send(recipes);
+  } catch(error){
+    next(error);
+  }
+});
+
+//add new recipe for family
+router.post("/family",async(req, res, next)=>{
+  try{
+    const user_id = req.user_id;
+    const recipe_id = req.user_id;
+    const owner_recipe = req.owner_recipe;
+    const when_eat = req.when_eat;
+    const ingredients = req.ingredients;
+    const instructions = req.instructions;
+    await user_utils.addFamilyRecipes(owner_recipe, when_eat, ingredients,instructions, user_id, recipe_id)
+    res.status(200).send("Add recipe successfully");
+  } catch(error){
+    next(error);
+  }
+});
+
+//PERSONAL PAGE
+
+//get user's recipes
+router.get("/personal",async(req, res, next)=>{
+  try{
+    const recipes = await user_utils.getUserRecipe(req.session.user_id)
+    res.status(200).send(recipes);
+  } catch(error){
+    next(error);
+  }
+});
+
+//add new recipe to user
+router.get("/personal",async(req, res, next)=>{
+  try{
+    let params = {}
+    params.user_id = req.user_id
+    params.recipe_id = req.recipe_id
+    params.duration =  req.duration
+    params.likes = req.likes
+    params.image = req.image
+    params.vegan = req.vegan
+    params.vegetarian = req.vegetarian
+    params.glutenFree = req.glutenFree
+    params.instructions = req.instructions
+    await user_utils.addUserRecipe(params);
+    res.status(200).send("The recipe added!");
+  } catch(error){
+    next(error);
+  }
+});
+
+//
+
+//3 watched recipes
+router.get('/watchedList', async (req,res,next) => {
+  try{
+    const recipes_id = await user_utils.getTreeLastRecipes(recipes_id);
+    const results = recipes_id;
+    res.status(200).send(results);
+  } catch(error){
+    next(error); 
+  }
+});
+
+
+//only get watch
+router.get('/watched', async (req,res,next) => {
+  try{
+    const user_id = req.session.user_id;
+    const result = await user_utils.getWatchedRecipes(user_id);
+   res.status(200).send(result);
+  } catch(error){
+    next(error); 
+  }
+});
 
 module.exports = router;

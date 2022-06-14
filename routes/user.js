@@ -95,7 +95,7 @@ router.get("/personal",async(req, res, next)=>{
 });
 
 //add new recipe to user
-router.get("/personal",async(req, res, next)=>{
+router.post("/personal",async(req, res, next)=>{
   try{
     let params = {}
     params.user_id = req.user_id

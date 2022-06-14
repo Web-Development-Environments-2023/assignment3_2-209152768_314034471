@@ -53,17 +53,6 @@ router.get('/favorites', async (req,res,next) => {
   }
 });
 
-// add recipe to the favorite page to user
-router.post("/favorites", async (req, res, next) => {
-  try {
-    const user_id = req.session.user_id;
-    const recipe_id = req.body.recipe_id;
-    await user_utils.markAsFavorite(user_id, recipe_id);
-    res.status(200).send("The recipe saved in favorite!");
-  } catch (error) {
-    next(error);
-  }
-});
 
 //FAMILY PAGE
 

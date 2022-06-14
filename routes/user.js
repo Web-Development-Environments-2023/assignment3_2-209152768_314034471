@@ -52,13 +52,6 @@ router.get('/favorites', async (req,res,next) => {
   }
 });
 
-//family
-
-
-//my recipes
-
-
-//last recipes
 
 
 module.exports = router;

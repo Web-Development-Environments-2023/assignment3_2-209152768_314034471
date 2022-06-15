@@ -2,15 +2,15 @@ const DButils = require("./DButils");
 const recipes_utils = require("./recipes_utils");
 
 async function markAsFavorite(user_id, recipe_id){
-  let fav = await DButils.execQuery(`select * from db.FavoriteRecipes where user_id='${user_id}' and recipe_id='${recipe_id}'`);
+  let fav = await DButils.execQuery(`select * from FavoriteRecipes where user_id='${user_id}' and recipe_id='${recipe_id}'`);
   if(fav.lenght == 0){
-    await DButils.execQuery(`insert into db.FavoriteRecipes values ('${user_id}',${recipe_id})`)
+    await DButils.execQuery(`insert into FavoriteRecipes values ('${user_id}',${recipe_id})`)
   }
 }
 
 //get favorite recipe for user
 async function getFavoriteRecipes(user_id){
-    const recipes_id = await DButils.execQuery(`select recipe_id from db.FavoriteRecipes where user_id='${user_id}'`);
+    const recipes_id = await DButils.execQuery(`select recipe_id from FavoriteRecipes where user_id='${user_id}'`);
     return recipes_id;
 }
 
@@ -23,7 +23,7 @@ async function getFamilyRecipes(user_id){
 
 //add family recipes
 async function addFamilyRecipes(owner_recipe, when_eat, ingredients,instructions, user_id, recipe_id){
-  await DButils.execQuery(`insert into db.familyRecipes values ('${user_id}', '${recipe_id}', '${owner_recipe}', '${when_eat}', '${ingredients}', '${instructions}')`);
+  await DButils.execQuery(`insert into familyRecipes values ('${user_id}', '${recipe_id}', '${owner_recipe}', '${when_eat}', '${ingredients}', '${instructions}')`);
 }
 
    
@@ -34,39 +34,25 @@ async function getUserRecipe(user_id) {
 }
 
 //add user recipe
-async function addUserRecipe(params){
-  const user_id = params.user_id
-  const recipe_id = params.recipe_id
-  const duration =  params.duration
-  const likes = params.likes
-  const image = params.image
-  const vegan = params.vegan
-  const vegetarian = params.vegetarian
-  const glutenFree = params.glutenFree
-  const instructions = params.instructions
+async function addUserRecipe(user_id, recipe_id, duration, likes, image, vegan, vegetarian, glutenFree, instructions){
   await DButils.execQuery(`insert into personalRecipes values ( '${user_id}', '${recipe_id}', ${duration},'${likes}','${image}', ${vegan}, ${vegetarian}, ${glutenFree}, '${user_name}', '${extendedIngredients}', '${instructions}', '${servings}')`);
 
 }
 
 //get 3 lastest recipes
 //we need list or array of all the recipes and return the 3 last recipes
-async function getTreeLastRecipes(recipes_id){
-  let recipe_list = []
-  for(let i = 0; i < recipes_id.lenght; i++){
-    if(i == 3){
-      break;
-    }else{
-      recipe_list.push(await recipes_utils.getRecipeDetails(recipes_id[i]))
-    }
-  }
-  return recipe_list
-
+async function getLatestWatchedRecipes(user_id, num){
+  const recipe_ids = await getWatchedRecipeIds(user_id, num)
+  // "Promise.all" - need to wait for all the awaits to finish - source https://simplernerd.com/js-async-await-map/
+  return await Promise.all(recipe_ids.map(async (recipe_id) => {
+    return await recipes_utils.getRecipeDetails(recipe_id)
+  }))
 }
 
 //recipe watched
-async function getWatchedRecipes(user_id){
-  const recipes_id = await DButils.execQuery(`select recipe_id from db.watchedRecipes where username='${user_id}'`);
-  return recipes_id;
+async function getWatchedRecipeIds(user_id, limit){
+  const watchedRecipes =  await DButils.execQuery(`select recipe_id, max(create_time) as last_watch from watchedRecipes where user_id=${user_id} group by recipe_id order by last_watch desc ${limit ? 'limit ' + limit : ''}`);
+  return watchedRecipes.map((wr) => wr.recipe_id);
 }
 
     
@@ -77,6 +63,6 @@ exports.getFamilyRecipes = getFamilyRecipes;
 exports.addFamilyRecipes = addFamilyRecipes;
 exports.getUserRecipe = getUserRecipe;
 exports.addUserRecipe = addUserRecipe;
-exports.getTreeLastRecipes = getTreeLastRecipes;
-exports.getWatchedRecipes = getWatchedRecipes;
+exports.getLatestWatchedRecipes = getLatestWatchedRecipes;
+exports.getWatchedRecipeIds = getWatchedRecipeIds;
 

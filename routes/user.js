@@ -69,8 +69,8 @@ router.get("/family",async(req, res, next)=>{
 //add new recipe for family
 router.post("/family",async(req, res, next)=>{
   try{
-    const user_id = req.user_id;
-    const recipe_id = req.user_id;
+    const user_id = req.session.user_id;
+    const recipe_id = req.recipe_id;
     const owner_recipe = req.owner_recipe;
     const when_eat = req.when_eat;
     const ingredients = req.ingredients;
@@ -97,17 +97,16 @@ router.get("/personal",async(req, res, next)=>{
 //add new recipe to user
 router.post("/personal",async(req, res, next)=>{
   try{
-    let params = {}
-    params.user_id = req.user_id
-    params.recipe_id = req.recipe_id
-    params.duration =  req.duration
-    params.likes = req.likes
-    params.image = req.image
-    params.vegan = req.vegan
-    params.vegetarian = req.vegetarian
-    params.glutenFree = req.glutenFree
-    params.instructions = req.instructions
-    await user_utils.addUserRecipe(params);
+    const user_id = req.session.user_id
+    const recipe_id = req.recipe_id
+    const duration = req.duration
+    const likes = req.likes
+    const image = req.image
+    const vegan = req.vegan
+    const vegetarian = req.vegetarian
+    const glutenFree = req.glutenFree
+    const instructions = req.instructions
+    await user_utils.addUserRecipe(user_id, recipe_id, duration, likes, image, vegan, vegetarian, glutenFree, instructions);
     res.status(200).send("The recipe added!");
   } catch(error){
     next(error);
@@ -119,9 +118,8 @@ router.post("/personal",async(req, res, next)=>{
 //3 watched recipes
 router.get('/watchedList', async (req,res,next) => {
   try{
-    const recipes_id = await user_utils.getTreeLastRecipes(recipes_id);
-    const results = recipes_id;
-    res.status(200).send(results);
+    const recipes = await user_utils.getLatestWatchedRecipes(req.session.user_id, 3);
+    res.status(200).send(recipes);
   } catch(error){
     next(error); 
   }
@@ -131,9 +129,8 @@ router.get('/watchedList', async (req,res,next) => {
 //only get watch
 router.get('/watched', async (req,res,next) => {
   try{
-    const user_id = req.session.user_id;
-    const result = await user_utils.getWatchedRecipes(user_id);
-   res.status(200).send(result);
+    const recipe_ids = await user_utils.getWatchedRecipeIds(req.session.user_id);
+    res.status(200).send(recipe_ids);
   } catch(error){
     next(error); 
   }

@@ -2,28 +2,28 @@ const DButils = require("./DButils");
 const recipes_utils = require("./recipes_utils");
 
 async function markAsFavorite(user_id, recipe_id){
-  let fav = await DButils.execQuery(`select * from FavoriteRecipes where user_id='${user_id}' and recipe_id='${recipe_id}'`);
+  let fav = await DButils.execQuery(`select * from favorite_recipes where user_id='${user_id}' and recipe_id='${recipe_id}'`);
   if(fav.lenght == 0){
-    await DButils.execQuery(`insert into FavoriteRecipes values ('${user_id}',${recipe_id})`)
+    await DButils.execQuery(`insert into favorite_recipes values ('${user_id}',${recipe_id})`)
   }
 }
 
 //get favorite recipe for user
 async function getFavoriteRecipes(user_id){
-    const recipes_id = await DButils.execQuery(`select recipe_id from FavoriteRecipes where user_id='${user_id}'`);
+    const recipes_id = await DButils.execQuery(`select recipe_id from favorite_recipes where user_id='${user_id}'`);
     return recipes_id;
 }
 
 
 // get family recipes
 async function getFamilyRecipes(user_id){
-    const recipes_id = await DButils.execQuery(`select recipe_id from familyRecipes where user_id='${user_id}'`);
+    const recipes_id = await DButils.execQuery(`select recipe_id from family_recipes where user_id='${user_id}'`);
     return recipes_id;
 }   
 
 //add family recipes
 async function addFamilyRecipes(owner_recipe, when_eat, ingredients,instructions, user_id, recipe_id){
-  await DButils.execQuery(`insert into familyRecipes values ('${user_id}', '${recipe_id}', '${owner_recipe}', '${when_eat}', '${ingredients}', '${instructions}')`);
+  await DButils.execQuery(`insert into family_recipes values ('${user_id}', '${recipe_id}', '${owner_recipe}', '${when_eat}', '${ingredients}', '${instructions}')`);
 }
 
    
@@ -51,7 +51,7 @@ async function getLatestWatchedRecipes(user_id, num){
 
 //recipe watched
 async function getWatchedRecipeIds(user_id, limit){
-  const watchedRecipes =  await DButils.execQuery(`select recipe_id, max(create_time) as last_watch from watchedRecipes where user_id=${user_id} group by recipe_id order by last_watch desc ${limit ? 'limit ' + limit : ''}`);
+  const watchedRecipes =  await DButils.execQuery(`select recipe_id, max(create_time) as last_watch from watched_recipes where user_id=${user_id} group by recipe_id order by last_watch desc ${limit ? 'limit ' + limit : ''}`);
   return watchedRecipes.map((wr) => wr.recipe_id);
 }
 

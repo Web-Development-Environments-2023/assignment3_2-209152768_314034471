@@ -2,7 +2,7 @@ var express = require("express");
 var router = express.Router();
 const DButils = require("./utils/DButils");
 const user_utils = require("./utils/user_utils");
-const recipe_utils = require("./utils/recipes_utils");
+const recipes_utils = require("./utils/recipes_utils");
 
 /**
  * Authenticate all incoming requests by middleware
@@ -16,7 +16,8 @@ router.use(async function (req, res, next) {
       }
     }).catch(err => next(err));
   } else {
-    res.sendStatus(401);
+    //res.sendStatus(401);
+      next();
   }
 });
 
@@ -42,11 +43,13 @@ router.post('/favorites', async (req,res,next) => {
 router.get('/favorites', async (req,res,next) => {
   try{
     const user_id = req.session.user_id;
-    let favorite_recipes = {};
-    const recipes_id = await user_utils.getFavoriteRecipes(user_id);
-    let recipes_id_array = [];
-    recipes_id.map((element) => recipes_id_array.push(element.recipe_id)); //extracting the recipe ids into array
-    const results = await recipe_utils.getRecipesPreview(recipes_id_array);
+    //const favorite_recipes_ids = await user_utils.getFavoriteRecipes(user_id);
+    const favorite_recipes_ids = await user_utils.getFavoriteRecipes(123);
+    // "Promise.all" - need to wait for all the awaits to finish - source https://simplernerd.com/js-async-await-map/
+    // const results = await Promise.all(favorite_recipes_ids.map(async (recipe_id) => {
+    //   return await recipes_utils.getRecipePreview(recipe_id)
+    // }))
+    const results = [];
     res.status(200).send(results);
   } catch(error){
     next(error); 
@@ -117,7 +120,8 @@ router.post("/personal",async(req, res, next)=>{
 //3 watched recipes
 router.get('/watchedList', async (req,res,next) => {
   try{
-    const recipes = await user_utils.getLatestWatchedRecipes(req.session.user_id, 3);
+      //const recipes = await user_utils.getLatestWatchedRecipes(req.session.user_id, 3);
+      const recipes = await user_utils.getLatestWatchedRecipes(123, 3);
     res.status(200).send(recipes);
   } catch(error){
     next(error); 
@@ -128,7 +132,9 @@ router.get('/watchedList', async (req,res,next) => {
 //only get watch
 router.get('/watched', async (req,res,next) => {
   try{
-    const recipe_ids = await user_utils.getWatchedRecipeIds(req.session.user_id);
+    console.log("get watched", req.session);
+   // const recipe_ids = await user_utils.getWatchedRecipeIds(req.session.user_id);
+    const recipe_ids = await user_utils.getWatchedRecipeIds(123);
     res.status(200).send(recipe_ids);
   } catch(error){
     next(error); 

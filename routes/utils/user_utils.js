@@ -2,9 +2,9 @@ const DButils = require("./DButils");
 const recipes_utils = require("./recipes_utils");
 
 async function markAsFavorite(user_id, recipe_id){
-  let fav = await DButils.execQuery(`select * from favorite_recipes where user_id='${user_id}' and recipe_id='${recipe_id}'`);
-  if(fav.lenght == 0){
-    await DButils.execQuery(`insert into favorite_recipes values ('${user_id}',${recipe_id})`)
+  const fav = await DButils.execQuery(`select * from favorite_recipes where user_id='${user_id}' and recipe_id='${recipe_id}'`);
+  if(!fav[0]){
+    await DButils.execQuery(`insert into favorite_recipes (user_id, recipe_id) values ('${user_id}',${recipe_id})`)
   }
 }
 
@@ -35,12 +35,12 @@ async function getUserRecipe(user_id) {
 
 //add user recipe
 async function addUserRecipe(user_id, recipe_id, duration, likes, image, vegan, vegetarian, glutenFree, instructions){
-  await DButils.execQuery(`insert into personalRecipes values ( '${user_id}', '${recipe_id}', ${duration},'${likes}','${image}', ${vegan}, ${vegetarian}, ${glutenFree}, '${user_name}', '${extendedIngredients}', '${instructions}', '${servings}')`);
+  await DButils.execQuery(`insert into personalRecipes values ('${user_id}', '${recipe_id}', ${duration},'${likes}','${image}', ${vegan}, ${vegetarian}, ${glutenFree}, '${user_name}', '${extendedIngredients}', '${instructions}', '${servings}')`);
 }
 
 //add watched recipe
 async function addWatchedRecipe(user_id, recipe_id){
-  await DButils.execQuery(`insert into watchedrecipes values ( '${user_id}', '${recipe_id}')`);
+  await DButils.execQuery(`insert into watchedrecipes(user_id, recipe_id) values('${user_id}', '${recipe_id}')`);
 }
 
 //get 3 lastest recipes
@@ -54,7 +54,7 @@ async function getLatestWatchedRecipes(user_id, num){
 }
 
 //recipe watched
-async function getWatchedRecipeIds(user_id){
+async function getWatchedRecipeIds(user_id) {
   const watched_recipes = await DButils.execQuery(`select distinct recipe_id from watchedrecipes where user_id=${user_id}`);
   return extractRecipeIds(watched_recipes);
 }

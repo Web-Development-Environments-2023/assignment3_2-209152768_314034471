@@ -15,7 +15,7 @@ app.use(
   session({
     cookieName: "session", // the cookie key name
     //secret: process.env.COOKIE_SECRET, // the encryption key
-    secret: "template", // the encryption key
+    secret: "blargadeeblargblarg", // the encryption key
     duration: 24 * 60 * 60 * 1000, // expired after 20 sec
     activeDuration: 1000 * 60 * 5, // if expiresIn < activeDuration,
     cookie: {
@@ -59,16 +59,17 @@ const auth = require("./routes/auth");
 
 //#region cookie middleware
 app.use(function (req, res, next) {
-  console.log("req.session", req.session.user_id, req.session)
-  if (req.session && req.session.user_id) {
-    DButils.execQuery("SELECT user_id FROM users")
+  if (req.session && req.session.user_id) {   
+    DButils.execQuery(`SELECT id FROM users WHERE id=${req.session.user_id}`)
       .then((users) => {
-        if (users.find((x) => x.user_id === req.session.user_id)) {
+        if (users[0]) {
           req.user_id = req.session.user_id;
         }
         next();
       })
-      .catch((error) => next());
+      .catch((error) => {
+        next()
+      });
   } else {
     next();
   }

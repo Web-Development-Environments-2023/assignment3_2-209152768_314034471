@@ -10,7 +10,6 @@ router.post("/Register", async (req, res, next) => {
       !req.body.firstname ||
       !req.body.lastname ||
       !req.body.email ||
-      !req.body.profileurl ||
       !req.body.username ||
       !req.body.password ||
       !req.body.country
@@ -23,15 +22,15 @@ router.post("/Register", async (req, res, next) => {
       lastname: req.body.lastname,
       country: req.body.country,
       password: req.body.password,
-      email: req.body.email,
-      profilePic: req.body.profilePic
+      email: req.body.email
     }
     let users = [];
     users = await DButils.execQuery("SELECT username from users");
 
     if (users.find((x) => x.username === user_details.username))
-      throw { status: 409, message: "Username is exist!" };
+      throw { status: 409, message: "Please select a different username!" };
     if(req.body.password != req.body.confirmation_password) {
+      console.log("pwd validation", req.body.password, req.body.confirmation_password);
       throw { status: 500, message: "The password is wrong!" };
     }
     // add the new username
@@ -40,7 +39,8 @@ router.post("/Register", async (req, res, next) => {
       parseInt(process.env.bcrypt_saltRounds)
     );
     await DButils.execQuery(
-      `INSERT INTO users VALUES ('${user_details.username}', '${user_details.firstname}', '${user_details.lastname}',
+      `INSERT INTO users(username, first_name, last_name, country, password, email) 
+      VALUES ('${user_details.username}', '${user_details.firstname}', '${user_details.lastname}',
       '${user_details.country}', '${hash_password}', '${user_details.email}')`
     );
     res.status(201).send({ message: "user created", success: true });
@@ -57,24 +57,22 @@ router.post("/Login", async (req, res, next) => {
       return;
     }
     // check that username exists
-    const users = await DButils.execQuery("SELECT username FROM users");
-    if (!users.find((x) => x.username === req.body.username))
-      throw { status: 401, message: "Username or Password incorrect" };
-
-    // check that the password is correct
     const user = (
       await DButils.execQuery(
         `SELECT * FROM users WHERE username = '${req.body.username}'`
       )
     )[0];
 
+    if (!user)
+      throw { status: 401, message: "Username or Password incorrect" };
+
+    // check that the password is correct
     if (!bcrypt.compareSync(req.body.password, user.password)) {
       throw { status: 401, message: "Username or Password incorrect" };
     }
 
     // Set cookie
-    req.session.user_id = user.user_id;
-
+    req.session.user_id = user.id;
 
     // return cookie
     res.status(200).send({ message: "login succeeded", success: true });

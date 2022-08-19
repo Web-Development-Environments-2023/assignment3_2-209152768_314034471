@@ -69,7 +69,6 @@ function getRecipeData(recipe) {
 function getRecipeDetails(recipe) {
     return {
         ...getRecipeData(recipe),
-        servings: recipe.servings,
         instructions: recipe.instructions,
         analyzedInstructions: recipe.analyzedInstructions,
         ingredients: getIngredientsData(recipe.extendedIngredients)

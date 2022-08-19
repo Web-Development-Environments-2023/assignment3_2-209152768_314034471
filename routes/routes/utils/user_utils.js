@@ -7,6 +7,11 @@ async function markAsFavorite(user_id, recipe_id){
     await DButils.execQuery(`insert into favorite_recipes (user_id, recipe_id) values ('${user_id}',${recipe_id})`)
   }
 }
+//added saved recipes
+async function saveRecipe(user_id, title, readyInMinutes,ingredients, image, vegan, vegetarian, glutenFree, instructions, recipeOwners){
+  await DButils.execQuery(`insert into saveRecipe values ('${user_id}', '${title}', '${readyInMinutes}', '${ingredients}', '${image}', '${vegan}, '${vegetarian}, '${glutenFree}, '${instructions}, '${recipeOwners}'')`);
+
+}
 
 //get favorite recipe for user
 async function getFavoriteRecipes(user_id){
@@ -29,13 +34,13 @@ async function addFamilyRecipes(owner_recipe, when_eat, ingredients,instructions
    
 //get user recipe
 async function getUserRecipe(user_id) {
-  const user_recipes= await DButils.execQuery(`select recipe_id from personalRecipes where user_id='${user_id}'`);
+  const user_recipes= await DButils.execQuery(`select recipe_id from personalrecipes where user_id='${user_id}'`);
   return extractRecipeIds(user_recipes);
 }
 
 //add user recipe
 async function addUserRecipe(user_id, recipe_id, duration, likes, image, vegan, vegetarian, glutenFree, instructions){
-  await DButils.execQuery(`insert into personalRecipes values ('${user_id}', '${recipe_id}', ${duration},'${likes}','${image}', ${vegan}, ${vegetarian}, ${glutenFree}, '${user_name}', '${extendedIngredients}', '${instructions}', '${servings}')`);
+  await DButils.execQuery(`insert into personalrecipes values ('${user_id}', '${recipe_id}', ${duration},'${likes}','${image}', ${vegan}, ${vegetarian}, ${glutenFree}, '${user_name}', '${extendedIngredients}', '${instructions}', '${servings}')`);
 }
 
 //add watched recipe
@@ -72,4 +77,5 @@ exports.addUserRecipe = addUserRecipe;
 exports.getLatestWatchedRecipes = getLatestWatchedRecipes;
 exports.getWatchedRecipeIds = getWatchedRecipeIds;
 exports.addWatchedRecipe = addWatchedRecipe;
+exports.saveRecipe = saveRecipe;
 

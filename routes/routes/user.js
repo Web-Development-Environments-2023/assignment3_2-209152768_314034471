@@ -14,7 +14,8 @@ router.use(async function (req, res, next) {
       .then((users) => {
         if (!users[0]) { 
           res.sendStatus(401);
-        }      
+        }
+        req.user_id =  res.session.user_id; 
         next();
     }).catch(err => next(err));
   } else {
@@ -22,6 +23,27 @@ router.use(async function (req, res, next) {
       next();
   }
 });
+
+//Added Recipes
+router.post('/added', async (req,res,next) => {
+  try{
+      const user_id = req.session.user_id;
+      const title = req.session.title;
+      const readyInMinutes = req.session.readyInMinutes;
+      const ingredients = req.session.ingredients;
+      const image = req.session.image;
+      const vegan = req.session.vegan;
+      const vegetarian = req.session.vegetarian;
+      const glutenFree = req.session.glutenFree;
+      const instructions = req.session.instructions;
+      const recipeOwner = rq.session.recipeOwner;
+    
+    await user_utils.addFamilyRecipes(user_id, title, readyInMinutes,ingredients, image, vegan, vegetarian, glutenFree, instructions, recipeOwners)
+    res.status(201).send("The Recipe saved");
+    } catch(error){
+      next(error);
+  }
+})
 
 //FAVORITE PAGE
 

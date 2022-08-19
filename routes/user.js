@@ -15,7 +15,7 @@ router.use(async function (req, res, next) {
         if (!users[0]) { 
           res.sendStatus(401);
         }
-        req.user_id =  res.session.user_id; 
+        req.user_id =  req.session.user_id; 
         next();
     }).catch(err => next(err));
   } else {

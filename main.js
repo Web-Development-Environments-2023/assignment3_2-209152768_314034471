@@ -33,9 +33,9 @@ app.use(express.static(path.join(__dirname, "dist")));
 app.get("/",function(req,res)
 { 
   //remote: 
-  // res.sendFile(path.join(__dirname, '../assignment-3-3-basic/dist/index.html'));
+  res.sendFile(path.join(__dirname, '../assignment-3-3-basic/dist/index.html'));
   //local:
-  res.sendFile(__dirname+"/index.html");
+  //res.sendFile(__dirname+"/index.html");
 
 });
 

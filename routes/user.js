@@ -35,12 +35,9 @@ router.post('/addRecipe', async (req,res,next) => {
       const vegetarian = req.session.vegetarian;
       const glutenFree = req.session.glutenFree;
       const instructions = req.session.instructions;
-      const recipeOwner = rq.session.recipeOwner;
     
-    await user_utils.addFamilyRecipes(user_id, title, readyInMinutes,ingredients, image, vegan, vegetarian, glutenFree, instructions, recipeOwners)
-    status_code: 1
-
-    res.status(201).send("The Recipe saved");
+    await user_utils.saveRecipe(user_id, title, readyInMinutes,ingredients, image, vegan, vegetarian, glutenFree, instructions,null)
+    res.status(200).send("The Recipe saved");
     } catch(error){
       next(error);
   }
@@ -57,7 +54,6 @@ router.post('/favorites', async (req,res,next) => {
     const recipe_id = req.body.recipeId;
     console.log("add favorite", user_id, recipe_id);
     await user_utils.markAsFavorite(user_id,recipe_id);
-    status_code: 1
     res.status(200).send("The Recipe successfully saved as favorite");
     } catch(error){
     next(error);
@@ -82,8 +78,6 @@ router.get('/favorites', async (req,res,next) => {
     catch {
       results = favorite_recipes_ids.map(recipe_id => {return {id: recipe_id}});
     }
-    status_code: 1
-
     res.status(200).send(results);
   } catch(error){
     next(error); 
@@ -97,8 +91,6 @@ router.get('/favorites', async (req,res,next) => {
 router.get("/family",async(req, res, next)=>{
   try{
     const recipes = await user_utils.getFamilyRecipes(req.session.user_id)
-    status_code: 1
-
     res.status(200).send(recipes);
   } catch(error){
     next(error);
@@ -115,7 +107,6 @@ router.post("/family",async(req, res, next)=>{
     const ingredients = req.body.ingredients;
     const instructions = req.body.instructions;
     await user_utils.addFamilyRecipes(owner_recipe, when_eat, ingredients,instructions, user_id, recipe_id)
-    status_code: 1
     res.status(200).send("Add recipe successfully");
   } catch(error){
     next(error);
@@ -128,8 +119,6 @@ router.post("/family",async(req, res, next)=>{
 router.get("/personal",async(req, res, next)=>{
   try{
     const recipes = await user_utils.getUserRecipe(req.session.user_id)
-    status_code: 1
-
     res.status(200).send(recipes);
   } catch(error){
     next(error);
@@ -149,7 +138,6 @@ router.post("/personal",async(req, res, next)=>{
     const glutenFree = req.body.glutenFree
     const instructions = req.body.instructions
     await user_utils.addUserRecipe(user_id, recipe_id, duration, likes, image, vegan, vegetarian, glutenFree, instructions);
-    status_code: 1
     res.status(200).send("The recipe added!");
   } catch(error){
     next(error);
@@ -161,8 +149,6 @@ router.post("/personal",async(req, res, next)=>{
 router.get('/watchedList', async (req,res,next) => {
   try{
     const recipes = await user_utils.getLatestWatchedRecipes(req.session.user_id, 3);
-    status_code: 1
-
     res.status(200).send(recipes);
   } catch(error){
     next(error); 
@@ -173,8 +159,7 @@ router.get('/watchedList', async (req,res,next) => {
 //only get watch
 router.get('/watched', async (req,res,next) => {
   try{
-    const recipe_ids = await user_utils.getWatchedRecipeIds(req.session.user_id);
-    status_code: 1
+    const recipe_ids = await user_utils.getWatchedRecipeIds(req.session.user_id);1
 
     res.status(200).send(recipe_ids);
   } catch(error){
@@ -186,7 +171,6 @@ router.get('/watched', async (req,res,next) => {
 router.post('/watched', async (req,res,next) => {
   try{
     await user_utils.addWatchedRecipe(req.session.user_id, req.body.recipe_id);
-    status_code: 1
 
     res.status(200).send();
   } catch(error){

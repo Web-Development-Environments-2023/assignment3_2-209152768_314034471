@@ -43,7 +43,7 @@ router.post("/Register", async (req, res, next) => {
       VALUES ('${user_details.username}', '${user_details.firstname}', '${user_details.lastname}',
       '${user_details.country}', '${hash_password}', '${user_details.email}')`
     );
-    res.status(201).send({ message: "user created", success: true });
+    res.status(200).send({ message: "user created", success: true });
   } catch (error) {
     next(error);
   }
@@ -53,7 +53,7 @@ router.post("/Login", async (req, res, next) => {
   try {
     if (req.session && req.session.user_id)
     {
-      res.send({ success: false, status: 201, message: "User is already login!"});
+      res.send({ success: false, status: 200, message: "User is already login!"});
       return;
     }
     // check that username exists
